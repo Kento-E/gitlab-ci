@@ -1,0 +1,26 @@
+# .gitlab-ci.yml
+workflow:
+  rules:
+    - if: '$CI_COMMIT_BRANCH != "develop" && $CI_PIPELINE_SOURCE != "web" && $CI_PIPELINE_SOURCE != "schedule"'
+      when: never
+    - if: '$ENVIRONMNENT != "production"'
+      variables:
+        BUILD_MODE: dev
+    - variables:
+        BUILD_MODE: build
+
+variables:
+  PROJECT_NAME: my-project
+
+stages:
+  - prepare
+  - rollback
+  - deploy
+  - clear_cache
+  - migrate
+  - build
+  - auto_rollback
+  - end
+
+include:
+  - .gitlab-ci/prepare.yml

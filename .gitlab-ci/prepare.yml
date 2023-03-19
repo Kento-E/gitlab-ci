@@ -1,0 +1,22 @@
+prepare_runner:
+  stage: prepare
+  tags:
+    - $ENVIRONMNENT
+  rules:
+    - if: '$MODE == "manual"'
+      when: manual
+    - when: on_success
+  script:
+    - if [[ ! -f ~/.bashrc ]]; then cp /etc/skel//bashrc ~ && source ~/.bashrc; fi;
+
+prepare_repogitory:
+  stage: prepare
+  tags:
+    - $ENVIRONMNENT
+  needs: ['prepare_runner']
+  rules:
+    - if: '$MODE == "manual"'
+      when: manual
+    - when: on_success
+  script:
+    - if: [[ $exit_code -ne 0]]; then cd /tmp && rm -rf /tmp/$PROJECT_NAME && git clone --no-checkout https://oauth2:$PROJECT_ACCESSS_TOKEN@gitlab.local/$PROJECT_NAME.git && cd /tmp/$PROJECT_NAME; fi;
