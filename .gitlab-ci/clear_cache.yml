@@ -1,0 +1,14 @@
+clear_cache:
+  stage: clear_cache
+  tags:
+    - $ENVIRONMNENT
+  needs: ['deploy']
+  rules:
+    - if: '$CLEAR_CACHE != "true"'
+      when: never
+    - when: on_success
+  script:
+    - cd /opt/$PROJECT_NAME
+    - sudo php artisan optimize:clear
+    - sudo php /usr/local/bin/composer dump-autoload
+    - sudo supervisorctl restart 'laravel-worker:*'

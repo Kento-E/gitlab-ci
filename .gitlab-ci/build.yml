@@ -1,0 +1,12 @@
+build:
+  stage: build
+  tags:
+    - $ENVIRONMNENT
+  needs: ['deploy']
+  rules:
+    - if: '$MODE == "debug" || $BUILD != "true"'
+      when: never
+    - when: on_success
+  script:
+    - cd /opt/$PROJECT_NAME
+    - sudo npm run $BUILD_MODE

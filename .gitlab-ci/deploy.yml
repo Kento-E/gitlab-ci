@@ -1,0 +1,41 @@
+deploy:
+  stage: deploy
+  tags:
+    - $ENVIRONMNENT
+  needs: ['prepeare_repository']
+  variables:
+    OPTIONS: '-rltDv --inplace --delete --remove-source-files'
+  rules:
+    - if: '$MODE == "debug"'
+      variables:
+        OPTIONS: '-rltDv --inplace --delete --remove-source-files --dry-run'
+  script:
+    - cd /opt/$PROJECT_NAME
+    - git checkout $CI_COMMIT_BRANCH
+    - git pull
+    - sudo rsync $OPTIONS /tmp/$PROJECT_NAME/services/app/ /opt/$PROJECT_NAME/app/
+    - sudo rsync $OPTIONS /tmp/$PROJECT_NAME/services/config/ /opt/$PROJECT_NAME/config/
+    - sudo rsync $OPTIONS /tmp/$PROJECT_NAME/services/database/ /opt/$PROJECT_NAME/database/
+    - sudo rsync $OPTIONS /tmp/$PROJECT_NAME/services/resources/ /opt/$PROJECT_NAME/resources/
+    - sudo rsync $OPTIONS /tmp/$PROJECT_NAME/services/routes/ /opt/$PROJECT_NAME/routes/
+
+rollback_deploy:
+  stage: deploy
+  tags:
+    - $ENVIRONMNENT
+  needs: ['deploy']
+  variables:
+    OPTIONS: '-rltDv --inplace --delete --remove-source-files'
+  rules:
+    - if: '$ROLLBACK_ON_FAILURE != "true" || $MODE == "debug"'
+      when: never
+    - when: on_failure
+  script:
+    - cd /opt/$PROJECT_NAME
+    - git checkout $ROLLBACK_BRANCH
+    - git pull
+    - sudo rsync $OPTIONS /tmp/$PROJECT_NAME/services/app/ /opt/$PROJECT_NAME/app/
+    - sudo rsync $OPTIONS /tmp/$PROJECT_NAME/services/config/ /opt/$PROJECT_NAME/config/
+    - sudo rsync $OPTIONS /tmp/$PROJECT_NAME/services/database/ /opt/$PROJECT_NAME/database/
+    - sudo rsync $OPTIONS /tmp/$PROJECT_NAME/services/resources/ /opt/$PROJECT_NAME/resources/
+    - sudo rsync $OPTIONS /tmp/$PROJECT_NAME/services/routes/ /opt/$PROJECT_NAME/routes/

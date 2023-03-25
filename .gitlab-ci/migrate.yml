@@ -1,0 +1,17 @@
+migrate:
+  stage: migrate
+  tags:
+    - $ENVIRONMNENT
+  needs: ['deploy']
+  variables:
+    OPTIONS: ''
+  rules:
+    - if: '$ROLLBACK == "true"'
+      when: never
+    - if: '$MODE == "debug"'
+      variables:
+        OPTIONS: '--pretend'
+    - when: on_success
+  script:
+    - cd /opt/$PROJECT_NAME
+    - sudo php artisan migrate --force $OPTIONS

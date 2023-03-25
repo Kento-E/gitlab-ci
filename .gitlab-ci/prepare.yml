@@ -1,3 +1,17 @@
+print_variables:
+  stage: prepare
+  tags:
+    - $ENVIRONMNENT
+  script:
+    - echo $BUILD
+    - echo $CLEAR_CACHE
+    - echo $CLEAR_SESSION
+    - echo $ENVIRONMNENT
+    - echo $MIGRATE
+    - echo $MODE
+    - echo $ROLLBACK_BRANCH
+    - echo $ROLLBACK_ON_FAILURE
+
 prepare_runner:
   stage: prepare
   tags:
@@ -19,4 +33,17 @@ prepare_repogitory:
       when: manual
     - when: on_success
   script:
-    - if: [[ $exit_code -ne 0]]; then cd /tmp && rm -rf /tmp/$PROJECT_NAME && git clone --no-checkout https://oauth2:$PROJECT_ACCESSS_TOKEN@gitlab.local/$PROJECT_NAME.git && cd /tmp/$PROJECT_NAME; fi;
+    - mkdir -p /tmp/$PROJECT_NAME
+    - cd /tmp/$PROJECT_NAME
+    - git checkout . || $exit_code=$?
+    - if: [[ $exit_code -ne 0]]; then cd /tmp && rm -rf /tmp/$PROJECT_NAME && git clone --no-checkout https://oauth2:$PROJECT_ACCESSS_TOKEN@gitlab.local/$PROJECT_NAME.git && cd /tmp/$PROJECT_NAME && cd /tmp/$PROJECT_NAME && git sparse-checkout set services/app/ services/config/ services/database/ services/resources/ services/routes/; fi;
+    - git fetch -p
+
+start_maintenance_page:
+  stage: prepare
+  tags:
+    - $ENVIRONMNENT
+  needs: ['prepare_repository']
+  script:
+    - cd /opt/$PROJECT_NAME
+    - php artisan down --retry=60 --message="ただいまメンテナンス中です。しばらくしてから画面を再読み込みしてください。"

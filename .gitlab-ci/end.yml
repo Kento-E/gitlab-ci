@@ -1,0 +1,21 @@
+clear_session:
+  stage: end
+  tags:
+    - $ENVIRONMNENT
+  rules:
+    - if: '$MODE != "debug" && $CLEAR_SESSION != "true"'
+      when: never
+    - when: on_success
+  script:
+    - cd /opt/$PROJECT_NAME
+    - sudo php artisan session:clear
+
+end_maintenance_page:
+  stage: end
+  tags:
+    - $ENVIRONMNENT
+  rules:
+    - when: always
+  script:
+    - cd /opt/$PROJECT_NAME
+    - php artisan up

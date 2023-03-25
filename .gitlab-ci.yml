@@ -23,4 +23,11 @@ stages:
   - end
 
 include:
-  - .gitlab-ci/prepare.yml
+  - /.gitlab-ci/prepare.yml
+  - /.gitlab-ci/rollback.yml
+  - /.gitlab-ci/deploy.yml
+  - /.gitlab-ci/env_file.yml
+  - /.gitlab-ci/clear_cache.yml
+  - /.gitlab-ci/migrate.yml
+  - /.gitlab-ci/build.yml
+  - /.gitlab-ci/end.yml
