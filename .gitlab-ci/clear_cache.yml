@@ -4,7 +4,7 @@ clear_cache:
     - $ENVIRONMNENT
   needs: ['deploy']
   rules:
-    - if: '$CLEAR_CACHE != "true"'
+    - if: '$MODE == "debug" || $CLEAR_CACHE != "true"'
       when: never
     - when: on_success
   script:
