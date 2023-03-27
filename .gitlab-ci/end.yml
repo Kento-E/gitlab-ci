@@ -4,8 +4,7 @@ clear_session:
     - $ENVIRONMNENT
   rules:
     - if: '$MODE != "debug" && $CLEAR_SESSION != "true"'
-      when: never
-    - when: on_success
+      when: always
   script:
     - cd /opt/$PROJECT_NAME
     - sudo php artisan session:clear
