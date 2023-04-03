@@ -1,0 +1,25 @@
+deploy_env_file:
+  stage: env_file
+  tags:
+    - $ENVIRONMNENT
+  needs: ['prepare_repository']
+  rules:
+    - if: '$MODE == "debug" || $ENV_FILE !~ /APP_KEY=.*\//'
+      when: never
+    - when: on_success
+  script:
+    - cp /opt/$PROJECT_NAME/.env /tmp/$PROJECT_NAME/.bk.env
+    - sudo cp /tmp/$PROJECT_NAME/.env /opt/$PROJECT_NAME/.env
+    - rm /tmp/$PROJECT_NAME/.env
+
+rollback_env_file:
+  stage: env_file
+  tags:
+    - $ENVIRONMNENT
+  needs: ['prepare_repository']
+  rules:
+    - if: '$MODE == "debug" || $ENV_FILE != "rollback"'
+      when: never
+    - when: on_success
+  script:
+    - sudo cp /tmp/$PROJECT_NAME/.bk.env /opt/$PROJECT_NAME/.env
