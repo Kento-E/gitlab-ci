@@ -5,11 +5,13 @@ rollback:
   variables:
     OPTIONS: ''
   rules:
-    - if: '$ROLLBACK != "true" || $CI_PIPELINE_SOURCE != "web"'
+    - if: '$MIGRATE != "rollback" || $CI_PIPELINE_SOURCE != "web"'
       when: never
     - if: '$MODE == "debug"'
       variables:
         OPTIONS: '--pretend'
   script:
     - cd /opt/$PROJECT_NAME
+    - php artisan migrate:status
     - php artisan migrate:rollback --force $OPTIONS
+    - php artisan migrate:status

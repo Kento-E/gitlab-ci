@@ -2,11 +2,11 @@ migrate:
   stage: migrate
   tags:
     - $ENVIRONMNENT
-  needs: ['deploy']
+  needs: ['clear_cache']
   variables:
     OPTIONS: ''
   rules:
-    - if: '$ROLLBACK == "true"'
+    - if: '$MIGRATE != "true"'
       when: never
     - if: '$MODE == "debug"'
       variables:
@@ -14,4 +14,6 @@ migrate:
     - when: on_success
   script:
     - cd /opt/$PROJECT_NAME
+    - php artisan migrate:status
     - sudo php artisan migrate --force $OPTIONS
+    - php artisan migrate:status
