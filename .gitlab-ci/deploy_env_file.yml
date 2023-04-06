@@ -9,6 +9,8 @@ deploy_env_file:
     - when: on_success
   script:
     - cp /opt/$PROJECT_NAME/.env /tmp/$PROJECT_NAME/.bk.env
+    - sudo echo -e "$ENV_FILE" > /tmp/$PROJECT_NAME/.env
+    - sed -i -z "s/\r /\n/g" /tmp/$PROJECT_NAME/.env
     - sudo cp /tmp/$PROJECT_NAME/.env /opt/$PROJECT_NAME/.env
     - rm /tmp/$PROJECT_NAME/.env
 
